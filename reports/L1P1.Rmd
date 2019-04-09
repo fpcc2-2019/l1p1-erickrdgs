@@ -13,9 +13,10 @@ body {
 text-align: justify}
 </style>
 
-```{r setup, include=FALSE}
-library(tidyverse, warn.conflicts = F)
+```{r setup, include=FALSE,  warning=FALSE}
+library(tidyverse)
 library(plotly)
+library(here)
 
 theme_set(theme_bw())
 
@@ -23,7 +24,6 @@ knitr::opts_chunk$set(tidy = FALSE,
                       fig.width = 6,
                       fig.height = 5,
                       echo = TRUE)
-
 ```
 A seguir, serão analisados os dados sobre o clima (temperatura e chuvas) de Campina Grande e João Pessoa. Primeiro teremos uma visão geral dos dados e então, algumas perguntas serão levantadas e respondidas. 
 
@@ -42,15 +42,15 @@ Nos nossos dados temos informação a respeito da cidade, semanas, temperaturas 
 
 Nesta seção, serão apresentadas e respondidas 4 perguntas a respeito do clima das cidades. 2 sobre a temperatura e 2 sobre a incidência de chuvas, respectivamente.
 
-###2.1 Quais os meses mais quentes e mais frios?
+####2.1 Quais os meses mais quentes e mais frios?
 
 ```{r message=FALSE, warning=FALSE}
-
 climaPorMes <- climas %>%
+    filter(ano != 2019 & ano != 2000) %>%
     group_by(cidade, mes) %>%
-    mutate(media = round(mean(tmedia), 2))
- 
-ggplot(climaPorMes, aes(x = mes, y = media, group = cidade, label = media, color=cidade)) +
+    summarise(media = round(mean(tmedia), 2))
+
+ggplot(climaPorMes, aes(x = mes, y = media, group = cidade, color=cidade)) +
         geom_line() +
         geom_point() +
         labs(y = "Temperatura média", x = "Mês") +
@@ -60,50 +60,49 @@ ggplot(climaPorMes, aes(x = mes, y = media, group = cidade, label = media, color
 
 Podemos observar que...
 
-###2.2 Qual foi o São João  mais frio de Campina Grande?
+####2.2 Qual foi o São João  mais frio de Campina Grande?
 
 ```{r message=FALSE, warning=FALSE}
-
 junhoCG <- climas %>%
     group_by(ano) %>%
     filter(mes == 6 & cidade == "Campina Grande") %>%
-    mutate(media = round(mean(tmedia), 2))
+    summarise(media = round(mean(tmedia), 2))
  
-ggplot(junhoCG, aes(x = ano, y = media, group = cidade)) +
-        geom_line() +
+ggplot(junhoCG, aes(x = reorder(ano, media), y = media, group = 1)) +
         geom_point() +
+        geom_line() +
         labs(y = "Temperatura média", x = "Ano") +
         ggtitle("Temperatura média no mês de Junho ao longo dos anos") +
-        theme(plot.title = element_text(hjust = 0.5))
-
-
+        theme(plot.title = element_text(hjust = 0.5)) + 
+        coord_flip()
 ```
 
 Podemos observar que...
 
-###2.3 A distribuição da chuva é diferente em meses específicos? 
+####2.3 A distribuição da chuva é diferente em meses específicos? 
 
 ```{r message=FALSE, warning=FALSE}
-
+climas %>%
+    ggplot(aes(x = mes, y = chuva)) +
+    geom_boxplot(coef = 1000, width = .4) + 
+    labs(x = "mês", y = "chuva (em mm)") +
+    facet_wrap(~cidade, nrow = 2)
 ```
 
 Podemos observar que...
 
-###2.4 No geral, onde chove mais?
+####2.4 No geral, onde chove mais?
 
 ```{r message=FALSE, warning=FALSE}
-
 chuvas <- climas %>%
     group_by(cidade) %>%
-    mutate(media = round(mean(chuva), 2))
+    summarise(media = round(mean(chuva), 2))
  
-ggplot(chuvas, aes(x=cidade, y=media, color=cidade)) +
+ggplot(chuvas, aes(x=cidade, y=media, fill = cidade)) +
         geom_bar(stat = "identity", show.legend = FALSE) +
         labs(y = "Volume médio de chuva", x = "Cidade") +
         ggtitle("Volume médio de chuva (CG x JP)") +
         theme(plot.title = element_text(hjust = 0.5))
-
-
 ```
 
 Podemos observar que...
