@@ -4,7 +4,7 @@ author: "Erick Santana Rodrigues"
 output:
   prettydoc::html_pretty:
     df_print: kable
-    theme: cayman
+    theme: hpstr
     highlight: github
 ---
 
@@ -44,6 +44,8 @@ Nesta seção, serão apresentadas e respondidas 4 perguntas a respeito do clima
 
 ####2.1 Quais os meses mais quentes e mais frios?
 
+Para responder esta pergunta, iremos considerar a temperatura média como forma de medir quão quente ou frio um mês foi. Isso por que medidas como temperatura máxima ou mínima nos mostram apenas uma temperatura pontual e não representam o cenário completo de tal semana, que apesar de ter registrado uma temperatura bem alta, não foi necessariamente quente.
+
 ```{r message=FALSE, warning=FALSE}
 climaPorMes <- climas %>%
     filter(ano != 2019 & ano != 2000) %>%
@@ -58,9 +60,11 @@ ggplot(climaPorMes, aes(x = mes, y = media, group = cidade, color=cidade)) +
         theme(plot.title = element_text(hjust = 0.5))
 ```
 
-Podemos observar que...
+Podemos observar que em Campina Grande o mês mais frio foi Julho, com uma temperatura média de pouco mais de 22 graus, enquanto que o mais quente foi dezembro, com uma temperatura bem próxima de 26. Em João Pessoa, o mês mais frio também foi Julho, porém, o mais quente foi Março.
 
 ####2.2 Qual foi o São João  mais frio de Campina Grande?
+
+Para responder esta pergunta, iremos filtrar os dados para ter informações apenas sobre Campina Grande e assim como na primeira questão, utilizaremos a temperatura média como forma de medir quão frio foi um São João.
 
 ```{r message=FALSE, warning=FALSE}
 junhoCG <- climas %>%
@@ -68,18 +72,19 @@ junhoCG <- climas %>%
     filter(mes == 6 & cidade == "Campina Grande") %>%
     summarise(media = round(mean(tmedia), 2))
  
-ggplot(junhoCG, aes(x = reorder(ano, media), y = media, group = 1)) +
+ggplot(junhoCG, aes(x = ano, y = media, group = 1)) +
         geom_point() +
         geom_line() +
         labs(y = "Temperatura média", x = "Ano") +
         ggtitle("Temperatura média no mês de Junho ao longo dos anos") +
-        theme(plot.title = element_text(hjust = 0.5)) + 
-        coord_flip()
+        theme(plot.title = element_text(hjust = 0.5))
 ```
 
-Podemos observar que...
+Podemos observar que o São João mais frio que Campina Grande teve foi o de 2004, atingindo uma temperatura média menor que 22 graus.
 
 ####2.3 A distribuição da chuva é diferente em meses específicos? 
+
+Para responder esta pergunta, faremos uso de boxplots para visualizar o espaçamento dos dados e a mediana do volume de chuvas nas duas cidades.
 
 ```{r message=FALSE, warning=FALSE}
 climas %>%
@@ -89,9 +94,11 @@ climas %>%
     facet_wrap(~cidade, nrow = 2)
 ```
 
-Podemos observar que...
+Podemos observar que em João Pessoa ocorrem mais chuvas e que tal quantidade vai crescendo até atingir um pico no mês de Junho (onde os dados são mais dispersos) e voltando a diminuir até o final do ano. No caso da Campina Grande ocorrem menos chuvas e tal quantidade tende-se a manter sempre baixa, mesmo com algumas grande chuvas em Fevereiro e Maio. O final do ano é a época em que menos chove na cidade.
 
 ####2.4 No geral, onde chove mais?
+
+Para responder esta pergunta, iremos calcular a média da quantidade de chuvas por cidade e traçaremos um gráfico de barras para a visualização.
 
 ```{r message=FALSE, warning=FALSE}
 chuvas <- climas %>%
@@ -105,4 +112,4 @@ ggplot(chuvas, aes(x=cidade, y=media, fill = cidade)) +
         theme(plot.title = element_text(hjust = 0.5))
 ```
 
-Podemos observar que...
+Podemos observar que o volume de chuva é maior em João Pessoa e portanto ela é a cidade em que ocorrem mais chuvas.
