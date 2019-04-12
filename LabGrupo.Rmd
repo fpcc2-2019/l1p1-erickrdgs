@@ -1,0 +1,123 @@
+---
+title: "L1P1 - Em grupo"
+author: "Erick, Rafael e João"
+output:
+  prettydoc::html_pretty:
+    df_print: kable
+    theme: cayman
+    highlight: github
+---
+
+<style>
+body {
+text-align: justify}
+</style>
+
+```{r setup, include=FALSE,  warning=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(here)
+library(dplyr)
+
+theme_set(theme_bw())
+
+knitr::opts_chunk$set(tidy = FALSE,
+                      fig.width = 6,
+                      fig.height = 5,
+                      echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE)
+
+climas = read_csv(here::here("data/clima_cg_jp-semanal.csv"), col_types = "cTdddddd")
+```
+
+#1. Perguntas
+
+####1.1 Qual foi o São João  mais frio de Campina Grande?
+
+```{r}
+junhoCG <- climas %>%
+    group_by(ano) %>%
+    filter(mes == 6 & cidade == "Campina Grande") %>%
+    mutate(media = round(mean(tmedia), 2))
+ 
+junhoCG$ano <- as.factor(junhoCG$ano)
+
+ggplot(junhoCG, aes(x = ano, y = media, group = 1)) +
+        geom_point() +
+        geom_point(aes(y=tmedia), color = "#FF6666") +
+        geom_line() +
+        labs(y = "Temperatura média", x = "Ano") +
+        ggtitle("Temperatura média no mês de Junho ao longo dos anos") +
+        theme(plot.title = element_text(hjust = 0.5), axis.text.x = element_text(angle = 270))
+```
+
+####1.2 No geral, onde chove mais?
+
+```{r}
+chuvas <- climas %>%
+    group_by(cidade) %>%
+    summarise(media = round(mean(chuva), 2))
+ 
+ggplot(chuvas, aes(x=cidade, y=media, fill = cidade)) +
+        geom_bar(stat = "identity", show.legend = FALSE) +
+        labs(y = "Volume médio de chuva", x = "Cidade") +
+        ggtitle("Volume médio de chuva (CG x JP)") +
+        theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+ggplot(climas, aes(x = cidade, y = chuva)) + 
+    geom_boxplot(width = .2, fill = "#FF6666") +
+    ylab("Quantidade de chuva semanal (mm)")
+```
+
+####1.3 Qual o verão mais quente?
+
+```{r}
+verao_cg <- climas %>%
+    filter(cidade == "Campina Grande" & mes %in% c(1, 2, 3) & ano > 1992 & ano != 2001) %>%
+    group_by(ano) %>%
+    mutate(media = round(mean(tmedia), 2))
+
+verao_cg$ano <- as.factor(verao_cg$ano)
+
+ggplot(data = verao_cg, aes(reorder(ano,media), y = media, fill = cidade)) +
+    geom_bar(stat = "identity", position = "dodge") + 
+    ylab("Média semanal da temperatura média (ºC)") + 
+    xlab("Ano") + 
+    coord_flip()
+
+```
+
+```{r}
+verao_jp <- climas %>%
+    filter(cidade == "João Pessoa" & mes %in% c(1, 2, 3) & ano > 1992 & ano != 2001) %>%
+    group_by(ano) %>%
+    mutate(media = round(mean(tmedia), 2))
+
+verao_jp$ano <- as.factor(verao_jp$ano)
+
+ggplot(data = verao_jp, aes(reorder(ano,media), y = media, fill = cidade)) +
+    geom_bar(stat = "identity", position = "dodge") + 
+    ylab("Média semanal da temperatura média (ºC)") + 
+    xlab("Ano") + 
+    coord_flip()
+
+```
+
+```{r fig.height = 8, fig.width = 12}
+verao <- climas %>%
+    group_by(ano, cidade) %>%
+    filter(mes %in% c(1, 2, 3) & ano > 1992 & ano != 2001) %>%
+    mutate(media = round(mean(tmedia), 2))
+
+ggplot(verao, aes(x = ano, y = tmedia, group = ano)) + 
+       geom_boxplot(fill = "#FF6666") + 
+       # scale_x_discrete(limits = c(1995:2019)) + 
+       xlab("Mês") + 
+       ylab("Temperatura média semanal") +
+       facet_grid(.~cidade) +
+       theme(axis.text.x = element_text(angle = 270))
+```
+

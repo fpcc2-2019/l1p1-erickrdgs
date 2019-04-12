@@ -15,8 +15,9 @@ text-align: justify}
 
 ```{r setup, include=FALSE,  warning=FALSE}
 library(tidyverse)
-library(plotly)
+library(ggplot2)
 library(here)
+library(dplyr)
 
 theme_set(theme_bw())
 
@@ -89,7 +90,7 @@ Para responder esta pergunta, faremos uso de boxplots para visualizar o espaçam
 ```{r message=FALSE, warning=FALSE}
 climas %>%
     ggplot(aes(x = mes, y = chuva)) +
-    geom_boxplot(coef = 1000, width = .4) + 
+    geom_boxplot(width = .4) + 
     labs(x = "mês", y = "chuva (em mm)") +
     facet_wrap(~cidade, nrow = 2)
 ```
