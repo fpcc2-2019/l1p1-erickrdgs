@@ -33,7 +33,13 @@ climas = read_csv(here::here("data/clima_cg_jp-semanal.csv"), col_types = "cTddd
 
 #1. Perguntas
 
+A seguir, serão apresentadas e respondidas 3 perguntas a respeito do clima de Campina Grande e João Pessoa. 2 sobre a temperatura e 1 sobre a incidência de chuvas.
+
 ####1.1 Qual foi o São João  mais frio de Campina Grande?
+
+Nosso objetivo é descobrir em qual ano houve o São João mais frio de nossa cidade, para isso iremos obter as temperaturas médias semanais de todo o mês de junho, mas por qual motivo usar as médias? Porque elas nos dão uma ideia de onde está a concentração das temperaturas levantadas em cada uma das semanas.
+
+Nossa visualização mostra um gráfico de linha da média das temperaturas do mês de junho, de 1995 a 2018, assim como um gráfico de pontos que retrata as temperaturas médias semanais em cada um desses meses.
 
 ```{r}
 junhoCG <- climas %>%
@@ -49,8 +55,10 @@ ggplot(junhoCG, aes(x = ano, y = media, group = 1)) +
         geom_line() +
         labs(y = "Temperatura média", x = "Ano") +
         ggtitle("Temperatura média no mês de Junho ao longo dos anos") +
-        theme(plot.title = element_text(hjust = 0.5), axis.text.x = element_text(angle = 270))
+        theme(plot.title = element_text(hjust = 0.5), axis.text.x = element_text(hjust = 0.8, angle = 45))
 ```
+
+Observando o gráfico, podemos notar que o São João mais frio de Campina Grande foi em 2004, porém a semana mais fria que tivemos em um período junino aconteceu apenas em 2008. Porque tal ano não foi o mais frio então? Observando as médias semanais de 2008 podemos ver que, apesar de ter tido a semana mais fria de Junho, seus dados estão concentrados mais acima de 22°C, fazendo com que sua média fique maior que a do ano 2004.
 
 ####1.2 No geral, onde chove mais?
 
@@ -74,29 +82,29 @@ ggplot(climas, aes(x = cidade, y = chuva)) +
 
 ####1.3 Qual o verão mais quente?
 
+O objetivo é tomar conhecimento sobre em qual ano tivemos o verão mais quente. Essa resposta pode nos ajudar a responder várias outras possíveis perguntas. Será que algum ano específico se destacou muito em relação aos outros? O ano do verão mais quente é o mesmo para as duas cidades? Os anos mais recentes são os mais quentes? Para responder a pergunta é necessário obter as temperaturas médias semanais das duas cidades no meses de janeiro, fevereiro e março e verificar os valores por ano com o objetivo de terminar em que qual ano tivemos temperaturas mais elevadas.
+
+As duas primeiras visualizações mostram gráficos de barras para as duas cidades contendo a média das temperaturas médias semanais por ano. A terceira visualização mostra a distribuição das temperaturas médias por ano e por cidade.
+
 ```{r}
 verao_cg <- climas %>%
     filter(cidade == "Campina Grande" & mes %in% c(1, 2, 3) & ano > 1992 & ano != 2001) %>%
     group_by(ano) %>%
     mutate(media = round(mean(tmedia), 2))
 
+verao_jp <- climas %>%
+    filter(cidade == "João Pessoa" & mes %in% c(1, 2, 3) & ano > 1992 & ano != 2001) %>%
+    group_by(ano) %>%
+    mutate(media = round(mean(tmedia), 2))
+
 verao_cg$ano <- as.factor(verao_cg$ano)
+verao_jp$ano <- as.factor(verao_jp$ano)
 
 ggplot(data = verao_cg, aes(reorder(ano,media), y = media, fill = cidade)) +
     geom_bar(stat = "identity", position = "dodge") + 
     ylab("Média semanal da temperatura média (ºC)") + 
     xlab("Ano") + 
     coord_flip()
-
-```
-
-```{r}
-verao_jp <- climas %>%
-    filter(cidade == "João Pessoa" & mes %in% c(1, 2, 3) & ano > 1992 & ano != 2001) %>%
-    group_by(ano) %>%
-    mutate(media = round(mean(tmedia), 2))
-
-verao_jp$ano <- as.factor(verao_jp$ano)
 
 ggplot(data = verao_jp, aes(reorder(ano,media), y = media, fill = cidade)) +
     geom_bar(stat = "identity", position = "dodge") + 
@@ -106,7 +114,9 @@ ggplot(data = verao_jp, aes(reorder(ano,media), y = media, fill = cidade)) +
 
 ```
 
-```{r fig.height = 8, fig.width = 12}
+A diferença da média das temperaturas é pequena de ano para ano, mas o ano de 1998 apresentou maior média para ambas as cidades. O ano de 2005 vem logo em seguida também para as duas cidades. 
+
+```{r fig.height = 6, fig.width = 12}
 verao <- climas %>%
     group_by(ano, cidade) %>%
     filter(mes %in% c(1, 2, 3) & ano > 1992 & ano != 2001) %>%
@@ -121,3 +131,4 @@ ggplot(verao, aes(x = ano, y = tmedia, group = ano)) +
        theme(axis.text.x = element_text(angle = 270))
 ```
 
+Observando a distribuição dos dados com boxplots, vemos que para Campina Grande está mais claro que 1998 foi o ano com o verão mais quente, mas para João Pessoa isso não fica tão claro assim, já que vários anos aparecem “empatados” a olho nu.
