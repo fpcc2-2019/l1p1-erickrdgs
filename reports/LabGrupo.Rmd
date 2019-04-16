@@ -135,7 +135,7 @@ verao$ano <- as.factor(verao$ano)
 
 ggplot(verao, aes(x = ano, y = tmedia, group = ano)) + 
     geom_boxplot(fill = "#FF6666") + 
-    xlab("Mês") + 
+    xlab("Ano") + 
     ylab("Temperatura média semanal") +
     facet_grid(.~cidade) +
     theme(axis.text.x = element_text(hjust = 0.8, angle = 45))
