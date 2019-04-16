@@ -1,6 +1,6 @@
 ---
 title: "L1P1 - Em grupo"
-author: "Erick, Rafael e João"
+author: "Erick Santana Rodrigues, Rafael Vieira Falcão e João Victor Barroso Mafra"
 output:
   prettydoc::html_pretty:
     df_print: kable
@@ -54,7 +54,6 @@ ggplot(junhoCG, aes(x = ano, y = media, group = 1)) +
         geom_point(aes(y=tmedia), color = "#FF6666") +
         geom_line() +
         labs(y = "Temperatura média", x = "Ano") +
-        ggtitle("Temperatura média no mês de Junho ao longo dos anos") +
         theme(plot.title = element_text(hjust = 0.5), axis.text.x = element_text(hjust = 0.8, angle = 45))
 ```
 
@@ -75,7 +74,6 @@ chuvas <- climas %>%
 ggplot(chuvas, aes(x=cidade, y=media, fill = cidade)) +
         geom_bar(stat = "identity", show.legend = FALSE) +
         labs(y = "Volume médio de chuva", x = "Cidade") +
-        ggtitle("Volume médio de chuva (CG x JP)") +
         theme(plot.title = element_text(hjust = 0.5))
 ```
 
@@ -89,11 +87,11 @@ climas %>%
     ylab("Quantidade de chuva semanal (mm)")
 ```
 
-Verificando a linha que descreve a mediana no boxplot podemos nitidamente notar que a mediana da quantidade média de chuva semanal de JP é maior do que a mediana da quantidade média de chuva semanal em CG. Portanto, juntando as conclusões retiradas utilizando ambas medidas agregadoras da média e mediana, podemos concluir que durante o período de 1995-2019 (com excessão dos anos de 2000 e 2001) a cidade de João Pessoa pode ser considerada uma cidade mais quente em comparação com a cidade de Campina Grande.
+Verificando a linha que descreve a mediana no boxplot podemos nitidamente notar que a mediana da quantidade média de chuva semanal de JP é maior do que a mediana da quantidade média de chuva semanal em CG. Portanto, juntando as conclusões retiradas utilizando ambas medidas agregadoras da média e mediana, podemos concluir que durante o período de 1995-2019 (com excessão dos anos de 2000 e 2001) a cidade de João Pessoa pode ser considerada uma cidade em que se chove mais em comparação com a cidade de Campina Grande.
 
 ####1.3 Qual o verão mais quente?
 
-O objetivo é tomar conhecimento sobre em qual ano tivemos o verão mais quente. Essa resposta pode nos ajudar a responder várias outras possíveis perguntas. Será que algum ano específico se destacou muito em relação aos outros? O ano do verão mais quente é o mesmo para as duas cidades? Os anos mais recentes são os mais quentes? Para responder a pergunta é necessário obter as temperaturas médias semanais das duas cidades no meses de janeiro, fevereiro e março e verificar os valores por ano com o objetivo de terminar em que qual ano tivemos temperaturas mais elevadas.
+O objetivo é tomar conhecimento sobre em qual ano tivemos o verão mais quente. Essa resposta pode nos ajudar a responder várias outras possíveis perguntas. Será que algum ano específico se destacou muito em relação aos outros? O ano do verão mais quente é o mesmo para as duas cidades? Os anos mais recentes são os mais quentes? Para responder a pergunta é necessário obter as temperaturas médias semanais das duas cidades no meses de janeiro, fevereiro e março e verificar os valores por ano com o objetivo de determinar em qual ano tivemos temperaturas mais elevadas.
 
 As duas primeiras visualizações mostram gráficos de barras para as duas cidades contendo a média das temperaturas médias semanais por ano. A terceira visualização mostra a distribuição das temperaturas médias por ano e por cidade.
 
@@ -133,12 +131,14 @@ verao <- climas %>%
     filter(mes %in% c(1, 2, 3) & ano > 1992 & ano != 2001) %>%
     mutate(media = round(mean(tmedia), 2))
 
+verao$ano <- as.factor(verao$ano)
+
 ggplot(verao, aes(x = ano, y = tmedia, group = ano)) + 
-       geom_boxplot(fill = "#FF6666") + 
-       xlab("Mês") + 
-       ylab("Temperatura média semanal") +
-       facet_grid(.~cidade) +
-       theme(axis.text.x = element_text(angle = 270))
+    geom_boxplot(fill = "#FF6666") + 
+    xlab("Mês") + 
+    ylab("Temperatura média semanal") +
+    facet_grid(.~cidade) +
+    theme(axis.text.x = element_text(hjust = 0.8, angle = 45))
 ```
 
 Observando a distribuição dos dados com boxplots, vemos que para Campina Grande está mais claro que 1998 foi o ano com o verão mais quente, mas para João Pessoa isso não fica tão claro assim, já que vários anos aparecem “empatados” a olho nu.
